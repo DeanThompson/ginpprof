@@ -1,7 +1,7 @@
 ginpprof
 ========
 
-A wrapper for golang web framework gin to use net/http/pprof easily.
+A wrapper for [golang web framework gin](https://github.com/gin-gonic/gin) to use `net/http/pprof` easily.
 
 ## Install
 
