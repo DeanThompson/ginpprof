@@ -6,7 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Wrapper(router *gin.Engine) {
+// Wrap adds several routes from package `net/http/pprof` to *gin.Engine object
+func Wrap(router *gin.Engine) {
 	router.GET("/debug/pprof/", IndexHandler())
 	router.GET("/debug/pprof/heap", HeapHandler())
 	router.GET("/debug/pprof/goroutine", GoroutineHandler())
@@ -16,6 +17,9 @@ func Wrapper(router *gin.Engine) {
 	router.GET("/debug/pprof/profile", ProfileHandler())
 	router.GET("/debug/pprof/symbol", SymbolHandler())
 }
+
+// make sure we are backward compatible
+var Wrapper = Wrap
 
 func IndexHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {

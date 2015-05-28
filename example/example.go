@@ -15,7 +15,7 @@ func main() {
 
 	// automatically add routers for net/http/pprof
 	// e.g. /debug/pprof, /debug/pprof/heap, etc.
-	ginpprof.Wrapper(router)
+	ginpprof.Wrap(router)
 
 	router.Run(":8080")
 }
