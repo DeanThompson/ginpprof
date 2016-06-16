@@ -16,10 +16,11 @@ func Wrap(router *gin.Engine) {
 	router.GET("/debug/pprof/cmdline", CmdlineHandler())
 	router.GET("/debug/pprof/profile", ProfileHandler())
 	router.GET("/debug/pprof/symbol", SymbolHandler())
+	router.POST("/debug/pprof/symbol", SymbolHandler())
 	router.GET("/debug/pprof/trace", TraceHandler())
 }
 
-// Wrapper make sure we are backward compatible
+// Wrappers make sure we are backward compatible
 var Wrapper = Wrap
 
 // IndexHandler will pass the call from /debug/pprof to pprof
