@@ -12,6 +12,9 @@ func Wrap(router *gin.Engine) {
 	WrapGroup(&router.RouterGroup)
 }
 
+// Wrapper make sure we are backward compatible
+var Wrapper = Wrap
+
 // WrapGroup adds several routes from package `net/http/pprof` to *gin.RouterGroup object
 func WrapGroup(router *gin.RouterGroup) {
 	routers := []struct {
