@@ -35,7 +35,11 @@ func main() {
 
 	// automatically add routers for net/http/pprof
 	// e.g. /debug/pprof, /debug/pprof/heap, etc.
-	ginpprof.Wrapper(router)
+	ginpprof.Wrap(router)
+
+	// ginpprof also plays well with *gin.RouterGroup
+	// group := router.Group("/debug/pprof")
+	// ginpprof.WrapGroup(group)
 
 	router.Run(":8080")
 }
@@ -55,6 +59,7 @@ Start this server, and you will see such outputs:
 [GIN-debug] GET    /debug/pprof/symbol       --> github.com/DeanThompson/ginpprof.SymbolHandler.func1 (3 handlers)
 [GIN-debug] POST   /debug/pprof/symbol       --> github.com/DeanThompson/ginpprof.SymbolHandler.func1 (3 handlers)
 [GIN-debug] GET    /debug/pprof/trace        --> github.com/DeanThompson/ginpprof.TraceHandler.func1 (3 handlers)
+[GIN-debug] GET    /debug/pprof/mutex        --> github.com/DeanThompson/ginpprof.MutexHandler.func1 (3 handlers)
 [GIN-debug] Listening and serving HTTP on :8080
 ```
 

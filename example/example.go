@@ -17,5 +17,9 @@ func main() {
 	// e.g. /debug/pprof, /debug/pprof/heap, etc.
 	ginpprof.Wrap(router)
 
+	// ginpprof also plays well with *gin.RouterGroup
+	// group := router.Group("/debug/pprof")
+	// ginpprof.WrapGroup(group)
+
 	router.Run(":8080")
 }

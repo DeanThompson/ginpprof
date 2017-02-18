@@ -12,11 +12,7 @@ func newServer() *gin.Engine {
 	return r
 }
 
-func TestWrap(t *testing.T) {
-	r := newServer()
-
-	Wrap(r)
-
+func checkRouters(routers gin.RoutesInfo, t *testing.T) {
 	expectedRouters := map[string]string{
 		"/debug/pprof/":             "IndexHandler",
 		"/debug/pprof/heap":         "HeapHandler",
@@ -27,9 +23,9 @@ func TestWrap(t *testing.T) {
 		"/debug/pprof/profile":      "ProfileHandler",
 		"/debug/pprof/symbol":       "SymbolHandler",
 		"/debug/pprof/trace":        "TraceHandler",
+		"/debug/pprof/mutex":        "MutexHandler",
 	}
 
-	routers := r.Routes()
 	for _, router := range routers {
 		//fmt.Println(router.Path, router.Method, router.Handler)
 		name, ok := expectedRouters[router.Path]
@@ -39,5 +35,20 @@ func TestWrap(t *testing.T) {
 		if !strings.Contains(router.Handler, name) {
 			t.Errorf("handler for %s should contain %s, got %s", router.Path, name, router.Handler)
 		}
+	}
+}
+
+func TestWrap(t *testing.T) {
+	r := newServer()
+	Wrap(r)
+	checkRouters(r.Routes(), t)
+}
+
+func TestWrapGroup(t *testing.T) {
+	for _, prefix := range []string{"/debug", "/debug/", "/debug/pprof", "/debug/pprof/"} {
+		r := newServer()
+		g := r.Group(prefix)
+		WrapGroup(g)
+		checkRouters(r.Routes(), t)
 	}
 }

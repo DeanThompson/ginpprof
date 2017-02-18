@@ -2,26 +2,52 @@ package ginpprof
 
 import (
 	"net/http/pprof"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 // Wrap adds several routes from package `net/http/pprof` to *gin.Engine object
 func Wrap(router *gin.Engine) {
-	router.GET("/debug/pprof/", IndexHandler())
-	router.GET("/debug/pprof/heap", HeapHandler())
-	router.GET("/debug/pprof/goroutine", GoroutineHandler())
-	router.GET("/debug/pprof/block", BlockHandler())
-	router.GET("/debug/pprof/threadcreate", ThreadCreateHandler())
-	router.GET("/debug/pprof/cmdline", CmdlineHandler())
-	router.GET("/debug/pprof/profile", ProfileHandler())
-	router.GET("/debug/pprof/symbol", SymbolHandler())
-	router.POST("/debug/pprof/symbol", SymbolHandler())
-	router.GET("/debug/pprof/trace", TraceHandler())
+	WrapGroup(&router.RouterGroup)
 }
 
-// Wrappers make sure we are backward compatible
-var Wrapper = Wrap
+// WrapGroup adds several routes from package `net/http/pprof` to *gin.RouterGroup object
+func WrapGroup(router *gin.RouterGroup) {
+	routers := []struct {
+		Method  string
+		Path    string
+		Handler gin.HandlerFunc
+	}{
+		{"GET", "/debug/pprof/", IndexHandler()},
+		{"GET", "/debug/pprof/heap", HeapHandler()},
+		{"GET", "/debug/pprof/goroutine", GoroutineHandler()},
+		{"GET", "/debug/pprof/block", BlockHandler()},
+		{"GET", "/debug/pprof/threadcreate", ThreadCreateHandler()},
+		{"GET", "/debug/pprof/cmdline", CmdlineHandler()},
+		{"GET", "/debug/pprof/profile", ProfileHandler()},
+		{"GET", "/debug/pprof/symbol", SymbolHandler()},
+		{"POST", "/debug/pprof/symbol", SymbolHandler()},
+		{"GET", "/debug/pprof/trace", TraceHandler()},
+		{"GET", "/debug/pprof/mutex", MutexHandler()},
+	}
+
+	basePath := strings.TrimSuffix(router.BasePath(), "/")
+	var prefix string
+
+	switch {
+	case basePath == "":
+		prefix = ""
+	case strings.HasSuffix(basePath, "/debug"):
+		prefix = "/debug"
+	case strings.HasSuffix(basePath, "/debug/pprof"):
+		prefix = "/debug/pprof"
+	}
+
+	for _, r := range routers {
+		router.Handle(r.Method, strings.TrimPrefix(r.Path, prefix), r.Handler)
+	}
+}
 
 // IndexHandler will pass the call from /debug/pprof to pprof
 func IndexHandler() gin.HandlerFunc {
@@ -83,5 +109,12 @@ func SymbolHandler() gin.HandlerFunc {
 func TraceHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		pprof.Trace(ctx.Writer, ctx.Request)
+	}
+}
+
+// MutexHandler will pass the call from /debug/pprof/mutex to pprof
+func MutexHandler() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		pprof.Handler("mutex").ServeHTTP(ctx.Writer, ctx.Request)
 	}
 }
