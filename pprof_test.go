@@ -17,6 +17,7 @@ func checkRouters(routers gin.RoutesInfo, t *testing.T) {
 		"/debug/pprof/":             "IndexHandler",
 		"/debug/pprof/heap":         "HeapHandler",
 		"/debug/pprof/goroutine":    "GoroutineHandler",
+		"/debug/pprof/allocs":       "AllocsHandler",
 		"/debug/pprof/block":        "BlockHandler",
 		"/debug/pprof/threadcreate": "ThreadCreateHandler",
 		"/debug/pprof/cmdline":      "CmdlineHandler",
