@@ -25,6 +25,7 @@ func WrapGroup(router *gin.RouterGroup) {
 		{"GET", "/debug/pprof/", IndexHandler()},
 		{"GET", "/debug/pprof/heap", HeapHandler()},
 		{"GET", "/debug/pprof/goroutine", GoroutineHandler()},
+		{"GET", "/debug/pprof/allocs", AllocsHandler()},
 		{"GET", "/debug/pprof/block", BlockHandler()},
 		{"GET", "/debug/pprof/threadcreate", ThreadCreateHandler()},
 		{"GET", "/debug/pprof/cmdline", CmdlineHandler()},
@@ -70,6 +71,13 @@ func HeapHandler() gin.HandlerFunc {
 func GoroutineHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		pprof.Handler("goroutine").ServeHTTP(ctx.Writer, ctx.Request)
+	}
+}
+
+// AllocsHandler will pass the call from /debug/pprof/allocs to pprof
+func AllocsHandler() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		pprof.Handler("allocs").ServeHTTP(ctx.Writer, ctx.Request)
 	}
 }
 
