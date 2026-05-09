@@ -1,18 +1,19 @@
 ginpprof
 ========
 
-[![GoDoc](https://godoc.org/github.com/DeanThompson/ginpprof?status.svg)](https://godoc.org/github.com/DeanThompson/ginpprof)
-[![Build
-Status](https://travis-ci.org/DeanThompson/ginpprof.svg?branch=master)](https://travis-ci.org/DeanThompson/ginpprof)
+[![Go Reference](https://pkg.go.dev/badge/github.com/DeanThompson/ginpprof.svg)](https://pkg.go.dev/github.com/DeanThompson/ginpprof)
 
-A wrapper for [golang web framework gin](https://github.com/gin-gonic/gin) to use `net/http/pprof` easily.
+A wrapper for [gin](https://github.com/gin-gonic/gin) to mount `net/http/pprof` routes quickly.
+
+## Why this project
+
+`ginpprof` was created before `gin-contrib/pprof`, and many existing services still rely on it.
+This repository is maintained to keep those users on a stable and lightweight API.
 
 ## Install
 
-First install ginpprof to your GOPATH using `go get`:
-
 ```sh
-go get github.com/DeanThompson/ginpprof
+go get github.com/DeanThompson/ginpprof@latest
 ```
 
 ## Usage
@@ -33,11 +34,10 @@ func main() {
 		c.String(200, "pong")
 	})
 
-	// automatically add routers for net/http/pprof
-	// e.g. /debug/pprof, /debug/pprof/heap, etc.
+	// Mount default pprof routes under /debug/pprof
 	ginpprof.Wrap(router)
 
-	// ginpprof also plays well with *gin.RouterGroup
+	// Or mount via group:
 	// group := router.Group("/debug/pprof")
 	// ginpprof.WrapGroup(group)
 
@@ -45,24 +45,31 @@ func main() {
 }
 ```
 
-Start this server, and you will see such outputs:
+### Registered routes
 
-```text
-[GIN-debug] GET    /ping                     --> main.main.func1 (3 handlers)
-[GIN-debug] GET    /debug/pprof/             --> github.com/DeanThompson/ginpprof.IndexHandler.func1 (3 handlers)
-[GIN-debug] GET    /debug/pprof/heap         --> github.com/DeanThompson/ginpprof.HeapHandler.func1 (3 handlers)
-[GIN-debug] GET    /debug/pprof/goroutine    --> github.com/DeanThompson/ginpprof.GoroutineHandler.func1 (3 handlers)
-[GIN-debug] GET    /debug/pprof/block        --> github.com/DeanThompson/ginpprof.BlockHandler.func1 (3 handlers)
-[GIN-debug] GET    /debug/pprof/threadcreate --> github.com/DeanThompson/ginpprof.ThreadCreateHandler.func1 (3 handlers)
-[GIN-debug] GET    /debug/pprof/cmdline      --> github.com/DeanThompson/ginpprof.CmdlineHandler.func1 (3 handlers)
-[GIN-debug] GET    /debug/pprof/profile      --> github.com/DeanThompson/ginpprof.ProfileHandler.func1 (3 handlers)
-[GIN-debug] GET    /debug/pprof/symbol       --> github.com/DeanThompson/ginpprof.SymbolHandler.func1 (3 handlers)
-[GIN-debug] POST   /debug/pprof/symbol       --> github.com/DeanThompson/ginpprof.SymbolHandler.func1 (3 handlers)
-[GIN-debug] GET    /debug/pprof/trace        --> github.com/DeanThompson/ginpprof.TraceHandler.func1 (3 handlers)
-[GIN-debug] GET    /debug/pprof/mutex        --> github.com/DeanThompson/ginpprof.MutexHandler.func1 (3 handlers)
-[GIN-debug] Listening and serving HTTP on :8080
+- `GET /debug/pprof/`
+- `GET /debug/pprof/heap`
+- `GET /debug/pprof/goroutine`
+- `GET /debug/pprof/allocs`
+- `GET /debug/pprof/block`
+- `GET /debug/pprof/threadcreate`
+- `GET /debug/pprof/cmdline`
+- `GET /debug/pprof/profile`
+- `GET /debug/pprof/symbol`
+- `POST /debug/pprof/symbol`
+- `GET /debug/pprof/trace`
+- `GET /debug/pprof/mutex`
+
+## Security notes
+
+`pprof` endpoints expose runtime internals. For production:
+
+- protect routes with auth middleware,
+- restrict by network/IP,
+- or expose only in internal environments.
+
+## Development
+
+```sh
+go test ./...
 ```
-
-Now visit [http://127.0.0.1:8080/debug/pprof/](http://127.0.0.1:8080/debug/pprof/) and you'll see what you want.
-
-Have Fun.
